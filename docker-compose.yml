@@ -1,0 +1,29 @@
+x-volumes: &volumes
+  - ./README.md:/README.md
+  - ./source/maxml:/source/maxml
+  - ./source/maxml:/usr/local/lib/python/site-packages/maxml
+  - ./tests:/tests
+
+services:
+
+  black:
+    container_name: maxml-black
+    build:
+      dockerfile: ./Dockerfile
+      context: ./
+    image: xml-black
+    environment:
+      - SERVICE=black
+    volumes:
+      *volumes
+
+  tests:
+    container_name: maxml-tests
+    build:
+      dockerfile: ./Dockerfile
+      context: ./
+    image: xml-tests
+    environment:
+      - SERVICE=tests
+    volumes:
+      *volumes

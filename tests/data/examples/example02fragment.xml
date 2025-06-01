@@ -1,0 +1,7 @@
+<my:sub>
+  <my:seq>
+    <my:li my:index="1">ABC</my:li>
+    <my:li my:index="2">DEF</my:li>
+    <my:li my:index="3">XYZ</my:li>
+  </my:seq>
+</my:sub>

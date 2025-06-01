@@ -1,0 +1,9 @@
+<my:test another="another attribute" xmlns:my="http://namespace.example.org/my">
+  <my:sub>
+    <my:seq>
+      <my:li my:index="1">ABC</my:li>
+      <my:li my:index="2">DEF</my:li>
+      <my:li my:index="3">XYZ</my:li>
+    </my:seq>
+  </my:sub>
+</my:test>
