@@ -139,14 +139,40 @@ class Element(object):
 
         self._namespaces: set[Namespace] = set()
 
+        for key in list(attributes.keys()):
+            if key.startswith("xmlns:") and (xmlns := key.replace("xmlns:", "")):
+                for namespace in self.__class__._namespaces:
+                    if namespace.prefix == xmlns:
+                        break
+                else:
+                    namespace = Namespace(prefix=xmlns, uri=attributes[key])
+
+                    self.__class__._namespaces.add(namespace)
+
+                    self._namespaces.add(namespace)
+
+                del attributes[key]
+
         if namespace is None:
             for namespace in self.__class__._namespaces:
                 if namespace.prefix == prefix:
                     break
             else:
-                raise ValueError(
-                    f"No namespace has been registered for the '{prefix}' prefix associated with the '{name}' element!"
-                )
+                for key in list(attributes.keys()):
+                    if key.startswith("xmlns:") and key.endswith(prefix):
+                        namespace = Namespace(prefix=prefix, uri=attributes[key])
+
+                        self.__class__._namespaces.add(namespace)
+
+                        self._namespaces.add(namespace)
+
+                        del attributes[key]
+
+                        break
+                else:
+                    raise ValueError(
+                        f"No namespace has been registered for the '{prefix}' prefix associated with the '{name}' element!"
+                    )
 
             self._namespaces.add(namespace.copy().promote())
         elif isinstance(uri := namespace, str):
@@ -350,7 +376,10 @@ class Element(object):
                 "The 'value' argument must have a value that can be cast to a string!"
             )
 
-        self._attributes[name] = value
+        if name.startswith("xmlns:"):
+            self.register_namespace(prefix=name.replace("xmlns:", ""), uri=value)
+        else:
+            self._attributes[name] = value
 
         return self
 
@@ -588,6 +617,9 @@ class Element(object):
             # Add any attributes
             count = len(element.attributes)
             for index, (key, value) in enumerate(element.attributes.items(), start=1):
+                if key.startswith("xmlns:"):
+                    continue
+
                 if pretty and count > 1 and index >= 1 and index <= count:
                     string += f"\n{indent * (depth + 2)}"
                     newline = True
