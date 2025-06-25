@@ -3,7 +3,7 @@ from __future__ import annotations
 from maxml.namespace import Namespace
 from maxml.logging import logger
 
-from hybridmethod import hybridmethod
+from classicist import hybridmethod
 
 
 logger = logger.getChild(__name__)
@@ -71,7 +71,7 @@ class Element(object):
         for namespace in self._namespaces:
             if namespace.prefix == prefix:
                 if namespace.uri == uri:
-                    logger.warning(
+                    logger.info(
                         " >>> The '%s' namespace has already been registered..."
                         % (prefix)
                     )

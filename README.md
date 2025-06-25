@@ -18,7 +18,7 @@ using `pip` via the `pip install` command by entering the following into your sh
 
 ### Example Usage
 
-To use the MaXML library, import the library's and begin creating your XML document:
+To use the MaXML library, import the library and begin creating your XML document:
 
 ```python
 import maxml
