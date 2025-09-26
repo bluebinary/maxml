@@ -1,0 +1,12 @@
+<my:test xmlns:my="http://namespace.example.org/my">
+  <my:sub another="Test&apos;s all of the special characters &quot;2 &gt; 3 &lt; 1&quot; &amp; more!">
+    <my:seq>
+      <my:li my:index="1">This &amp; That</my:li>
+      <my:li my:index="2">1 &lt; 2</my:li>
+      <my:li my:index="3">3 &gt; 2</my:li>
+      <my:li my:index="4">That&apos;s looking good!</my:li>
+      <my:li my:index="5">Yes, I&apos;d agree, it is &quot;looking good&quot;!</my:li>
+      <my:li my:index="6">This &gt; is already encoded &#129;!</my:li>
+    </my:seq>
+  </my:sub>
+</my:test>

@@ -2,9 +2,15 @@ from __future__ import annotations
 
 from maxml.namespace import Namespace
 from maxml.logging import logger
+from maxml.enumerations import (
+    Context,
+    Escape,
+)
+from maxml.exceptions import MaXMLError
 
 from classicist import hybridmethod
 
+import re
 
 logger = logger.getChild(__name__)
 
@@ -77,9 +83,9 @@ class Element(object):
                     )
                     break
                 else:
-                    raise ValueError(
-                        "The '%s' namespace has already been registered with a different URI!"
-                        % (prefix)
+                    raise MaXMLError(
+                        "The '%s' namespace, %s, has already been registered with a different URI: %s!"
+                        % (prefix, uri, namespace.uri)
                     )
         else:
             if namespace := Namespace(prefix=prefix, uri=uri):
@@ -170,7 +176,7 @@ class Element(object):
 
                         break
                 else:
-                    raise ValueError(
+                    raise MaXMLError(
                         f"No namespace has been registered for the '{prefix}' prefix associated with the '{name}' element!"
                     )
 
@@ -557,6 +563,7 @@ class Element(object):
         pretty: bool = False,
         indent: str | int = None,
         encoding: str = None,
+        escape: Escape = Escape.All,
         **kwargs,
     ) -> str | bytes:
         """Supports serializing the current Element tree to a string or to a bytes array
@@ -564,6 +571,11 @@ class Element(object):
 
         if not isinstance(pretty, bool):
             raise TypeError("The 'pretty' argument must have a boolean value!")
+
+        if not isinstance(escape, Escape):
+            raise TypeError(
+                "The 'escape' argument must reference an Escape enumeration option!"
+            )
 
         if indent is None:
             indent = 2
@@ -585,10 +597,54 @@ class Element(object):
         elif not isinstance(encoding, str):
             raise TypeError("The 'encoding' argument must have a string value!")
 
+        def escaper(value: str, context: Context, escape: Escape) -> str:
+            """Helper method to escape special characters in XML attributes and text."""
+
+            if isinstance(value, str):
+                pass
+            elif hasattr(value, "__str__"):
+                value = str(value)
+            else:
+                raise TypeError(
+                    "The 'value' argument must have a string value or a value that can be cast to a string!"
+                )
+
+            replacements: dict[str, str] = {
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&apos;",
+            }
+
+            if context is Context.Attribute:
+                # Required replacements for element attribute values
+                required: list[str] = ["&", "<", '"']
+            elif context is Context.Text:
+                # Required replacements for element text
+                required: list[str] = ["&", "<"]
+            else:
+                # Require all replacements for other contexts
+                required: list[str] = [key for key in replacements]
+
+            for search, replacement in replacements.items():
+                if (escape is Escape.All) or (search in required):
+                    if search == "&":
+                        # Ensure only standalone "&" characters are replaced, ignoring
+                        # any that are part of an XML special character escape sequence
+                        value = re.sub(
+                            r"&(?!(([a-z]+|#x?[0-9a-fA-F]+);))", replacement, value
+                        )
+                    else:
+                        value = value.replace(search, replacement)
+
+            return value
+
         def stringify(
             element: Element,
             depth: int,
             pretty: bool = False,
+            escape: Escape = Escape.All,
             indent: str = None,
             **kwargs,
         ) -> str:
@@ -624,6 +680,8 @@ class Element(object):
                     string += f"\n{indent * (depth + 2)}"
                     newline = True
 
+                value = escaper(value, context=Context.Attribute, escape=escape)
+
                 string += f' {key}="{value}"'
 
             # Add any non-promoted namespaces (those which can follow any attributes)
@@ -656,7 +714,7 @@ class Element(object):
 
                 # Include the element's text content, if any
                 if element.text and (element.mixed or not element.children):
-                    string += element.text
+                    string += escaper(element.text, context=Context.Text, escape=escape)
 
                 # Include the element's children, if any
                 if element.children and (element.mixed or not element.text):
@@ -669,6 +727,7 @@ class Element(object):
                             depth=(depth + 1),
                             pretty=pretty,
                             indent=indent,
+                            escape=escape,
                             **kwargs,
                         )
 
@@ -684,6 +743,7 @@ class Element(object):
             depth=0,
             pretty=pretty,
             indent=indent,
+            escape=escape,
             **kwargs,
         )
 

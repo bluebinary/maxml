@@ -1,5 +1,9 @@
 # MaXML Library Change Log
 
+## [1.0.3] - 2025-09-25
+### Changed
+- Improved support for escaping special characters within XML attribute values and text.
+
 ## [1.0.2] - 2025-06-25
 ### Changed
 - Updated the deprecated dependency `hybridmethod` library to the new `classicist` library.
