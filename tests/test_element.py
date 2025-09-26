@@ -391,3 +391,73 @@ def test_maxml_fragment_tostring(element: maxml.Element, data: callable):
     assert isinstance(compare, str)
 
     assert string == compare
+
+
+def test_maxml_special_tostring(data: callable):
+    """Check serialization functionality works as expected with special characters"""
+
+    element = maxml.Element(name="my:test", namespace="http://namespace.example.org/my")
+
+    # Ensure that the element object's type is as expected
+    assert isinstance(element, maxml.Element)
+
+    sub = element.subelement("my:sub")
+
+    # Ensure that the subelement's type is as expected
+    assert isinstance(sub, maxml.Element)
+
+    # Ensure that the subelement's name prefix was parsed correctly
+    assert sub.prefix == "my"
+
+    # Ensure that the subelement's name was parsed correctly
+    assert sub.name == "sub"
+
+    # Ensure that the element's fullname was parsed correctly
+    assert sub.fullname == "my:sub"
+
+    # Ensure that the element's namespace prefix was registered correctly
+    assert sub.namespace.prefix == "my"
+
+    # Ensure that the element's namespace URI was registered correctly
+    assert sub.namespace.uri == "http://namespace.example.org/my"
+
+    # Ensure that the root has the expected depth
+    assert sub.depth == 1
+
+    sub.set("another", 'Test\'s all of the special characters "2 > 3 < 1" & more!')
+
+    values = [
+        "This & That",
+        "1 < 2",
+        "3 > 2",
+        "That's looking good!",
+        'Yes, I\'d agree, it is "looking good"!',
+        "This &gt; is already encoded &#129;!",
+    ]
+
+    sequence = sub.subelement("my:seq")
+
+    for index, value in enumerate(values, start=1):
+        item = sequence.subelement("my:li")
+        item.set("my:index", str(index))
+        item.text = value
+
+    string: str = element.tostring(pretty=True)
+
+    assert isinstance(string, str)
+
+    compare: str = data("examples/example03special-all.xml")
+
+    assert isinstance(compare, str)
+
+    assert string == compare
+
+    string: str = element.tostring(pretty=True, escape=maxml.Escape.Required)
+
+    assert isinstance(string, str)
+
+    compare: str = data("examples/example03special-required.xml")
+
+    assert isinstance(compare, str)
+
+    assert string == compare
