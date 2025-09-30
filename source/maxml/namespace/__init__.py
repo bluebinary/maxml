@@ -14,7 +14,7 @@ class Namespace(object):
     _uri: str = None
     _promoted: bool = False
 
-    def __init__(self, prefix: str, uri: str):
+    def __init__(self, prefix: str, uri: str, promoted: bool = False):
         """Initialize the Namespace class"""
 
         if not isinstance(prefix, str):
@@ -26,6 +26,11 @@ class Namespace(object):
             raise TypeError("The 'uri' argument must have a string value!")
 
         self._uri = uri
+
+        if not isinstance(promoted, bool):
+            raise TypeError("The 'promoted' argument must have a boolean value!")
+
+        self._promoted = promoted
 
     def __str__(self) -> str:
         """Return a string representation of the class for debugging purposes."""

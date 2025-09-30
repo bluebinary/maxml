@@ -84,10 +84,10 @@ The `Element` class constructor `Element(...)` takes the following arguments:
 
 The `Element` class provides the following methods:
 
- * `register_namespace(prefix: str, uri: str)` – The `register_namespace()`  method
-	supports registering namespaces globally for the module or per instance depending
-	on whether the method is called on the class directly or whether it is called on a
-	specific instance of the class.
+ * `register_namespace(prefix: str, uri: str, promoted: bool = False)` –
+	The `register_namespace()`  method supports registering namespaces globally for the
+	module or per instance depending on whether the method is called on the class
+	directly or whether it is called on a specific instance of the class.
 
 	If a namespace is registered globally for the module, the registered namespaces
 	become available for use by any instance of the class created within the program
@@ -101,6 +101,12 @@ The `Element` class provides the following methods:
 
 	Each namespace consists of a prefix which can be used to prefix element names
 	and the URI associated with that namespace prefix.
+	
+	Optionally, a namespace can be marked as promoted during registration, which will
+	result in the namespace being serialized into the XML before any attributes on the
+	element. Namespaces that are not marked as promoted will appear after attributes.
+	Namespace promotion can be enabled for a given namespace during registration by
+	passing the optional `promoted` keyword argument with the value of `True`.
 
 	For example, the 'rdf' prefix is associated with the following canonical URI:
 		"http://www.w3.org/1999/02/22-rdf-syntax-ns#"
