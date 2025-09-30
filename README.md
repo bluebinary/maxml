@@ -102,11 +102,15 @@ The `Element` class provides the following methods:
 	Each namespace consists of a prefix which can be used to prefix element names
 	and the URI associated with that namespace prefix.
 	
-	Optionally, a namespace can be marked as promoted during registration, which will
-	result in the namespace being serialized into the XML before any attributes on the
-	element. Namespaces that are not marked as promoted will appear after attributes.
-	Namespace promotion can be enabled for a given namespace during registration by
-	passing the optional `promoted` keyword argument with the value of `True`.
+	Optionally, a namespace can be marked as being promoted during registration, which
+	will result in the namespace being serialized into the XML before any attributes on
+	the element. Namespaces that are not marked as being promoted will appear after any
+	attributes on the element. Namespace promotion can be enabled for a given namespace
+	during registration by passing the optional `promoted` keyword argument with the
+	value of `True`. Whether a namespace is marked as promoted or not can be changed
+	after registration by changing a `Namespace` entity's `promoted` property value or
+	by using the `promote()` and `unpromote()` methods. See the **Namespace Class** for
+	more information.
 
 	For example, the 'rdf' prefix is associated with the following canonical URI:
 		"http://www.w3.org/1999/02/22-rdf-syntax-ns#"
@@ -253,6 +257,9 @@ The `Namespace` class constructor `Namespace(...)` takes the following arguments
 
  * `prefix` (`str`) – The required `prefix` argument sets the namespace prefix.
  * `uri` (`str`) – The required `uri` argument sets the namespace URI.
+ * `promoted` (`bool`) – The optional `promoted` argument sets whether the namespace is
+    marked as being promoted or not. Promoted namespaces result in the namespace being
+    serialized into the XML before any attributes on their associated element.
 
 The `Namespace` class provides the following methods:
 

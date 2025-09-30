@@ -463,6 +463,56 @@ def test_maxml_special_tostring(data: callable):
     assert string == compare
 
 
+def test_maxml_namespace_promotion(data: callable):
+    """Check promotion of registered namespaces works as expected"""
+
+    # Register a class level namespace
+    maxml.Element.register_namespace(
+        prefix="xy", uri="http://namespace.example.org/xy", promoted=True
+    )
+
+    # Create a new top-level element
+    element = maxml.Element(name="xy:test")
+
+    # Ensure that the Element object's type is as expected
+    assert isinstance(element, maxml.Element)
+
+    # Ensure that the Element object's namespace type is as expected
+    assert isinstance(element.namespace, maxml.Namespace)
+    assert element.namespace.prefix == "xy"
+    assert element.namespace.uri == "http://namespace.example.org/xy"
+    assert element.namespace.promoted is True
+
+    # Set an element attribute
+    element.set("xy:id", "1")
+
+    # Serialise the element to a string
+    string: str = element.tostring(pretty=True)
+
+    assert isinstance(string, str)
+
+    # Confirm that the promoted namespace was serialised before the attributes
+    compare: str = """<xy:test xmlns:xy="http://namespace.example.org/xy" xy:id="1"/>"""
+
+    assert string == compare
+
+    # Now mark the namespace as not being promoted to re-test the serialisation below
+    element.namespace.promoted = False
+
+    # Ensure that the promoted status has changed
+    assert element.namespace.promoted is False
+
+    # Serialise the element to a string
+    string: str = element.tostring(pretty=True)
+
+    assert isinstance(string, str)
+
+    # Confirm that the non-promoted namespace was serialised after the attributes
+    compare: str = """<xy:test xy:id="1" xmlns:xy="http://namespace.example.org/xy"/>"""
+
+    assert string == compare
+
+
 def test_maxml_namespace_promotion_non_promoted_namespace(data: callable):
     """Check promotion of registered namespaces works as expected"""
 
