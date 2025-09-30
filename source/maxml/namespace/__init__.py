@@ -94,7 +94,7 @@ class Namespace(object):
     def copy(self) -> Namespace:
         """Create an independent copy of the current Namespace instance."""
 
-        return Namespace(prefix=self.prefix, uri=self.uri)
+        return Namespace(prefix=self.prefix, uri=self.uri, promoted=self.promoted)
 
     @property
     def promoted(self) -> bool:
