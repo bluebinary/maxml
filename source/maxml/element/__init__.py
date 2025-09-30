@@ -28,7 +28,7 @@ class Element(object):
     _mixed: bool = False
 
     @hybridmethod
-    def register_namespace(self, prefix: str, uri: str):
+    def register_namespace(self, prefix: str, uri: str, promoted: bool = False):
         """Supports registering namespaces globally for the module or per instance
         depending on whether the method is called on the class directly or whether it is
         called on a specific instance of the class.
@@ -74,6 +74,9 @@ class Element(object):
         if not isinstance(uri, str):
             raise TypeError("The 'uri' argument must have a string value!")
 
+        if not isinstance(promoted, bool):
+            raise TypeError("The 'promoted' argument must have a boolean value!")
+
         for namespace in self._namespaces:
             if namespace.prefix == prefix:
                 if namespace.uri == uri:
@@ -88,7 +91,7 @@ class Element(object):
                         % (prefix, uri, namespace.uri)
                     )
         else:
-            if namespace := Namespace(prefix=prefix, uri=uri):
+            if namespace := Namespace(prefix=prefix, uri=uri, promoted=promoted):
                 self._namespaces.add(namespace)
 
     def __init__(
@@ -186,7 +189,7 @@ class Element(object):
                 if namespace.uri == uri:
                     break
             else:
-                namespace = Namespace(prefix=prefix, uri=uri)
+                namespace = Namespace(prefix=prefix, uri=uri, promoted=False)
 
             self.__class__._namespaces.add(namespace)
 
@@ -662,7 +665,7 @@ class Element(object):
             # Add any promoted namespaces (those which should proceed any attributes)
             count = len(element.namespaced)
             for index, namespace in enumerate(element.namespaced, start=1):
-                if not namespace.promoted:
+                if namespace.promoted is False:
                     continue
 
                 if pretty and count > 1 and (newline or (index > 1 and index <= count)):
@@ -691,7 +694,7 @@ class Element(object):
                 newline = True
 
             for index, namespace in enumerate(element.namespaced, start=1):
-                if namespace.promoted:
+                if namespace.promoted is True:
                     continue
 
                 if pretty and count > 1 and (newline or (index > 1 and index <= count)):

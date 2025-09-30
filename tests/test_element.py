@@ -461,3 +461,49 @@ def test_maxml_special_tostring(data: callable):
     assert isinstance(compare, str)
 
     assert string == compare
+
+
+def test_maxml_namespace_promotion_non_promoted_namespace(data: callable):
+    """Check promotion of registered namespaces works as expected"""
+
+    maxml.Element.register_namespace(
+        prefix="my1", uri="http://namespace.example.org/my1", promoted=False
+    )
+
+    element = maxml.Element(name="my1:test")
+
+    # Ensure that the element object's type is as expected
+    assert isinstance(element, maxml.Element)
+
+    element.set("my1:attribute", "1234")
+
+    string: str = element.tostring(pretty=True)
+
+    assert isinstance(string, str)
+
+    compare: str = data("examples/example04namespace-unpromoted.xml")
+
+    assert string == compare
+
+
+def test_maxml_namespace_promotion_promoted_namespace(data: callable):
+    """Check promotion of registered namespaces works as expected"""
+
+    maxml.Element.register_namespace(
+        prefix="my2", uri="http://namespace.example.org/my2", promoted=True
+    )
+
+    element = maxml.Element(name="my2:test")
+
+    # Ensure that the element object's type is as expected
+    assert isinstance(element, maxml.Element)
+
+    element.set("my2:attribute", "1234")
+
+    string: str = element.tostring(pretty=True)
+
+    assert isinstance(string, str)
+
+    compare: str = data("examples/example04namespace-promoted.xml")
+
+    assert string == compare

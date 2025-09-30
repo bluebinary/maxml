@@ -1,5 +1,9 @@
 # MaXML Library Change Log
 
+## [1.0.4] - 2025-09-29
+### Added
+- Support for optionally configuring namespaces as being promoted during registration.
+
 ## [1.0.3] - 2025-09-25
 ### Changed
 - Improved support for escaping special characters within XML attribute values and text.
