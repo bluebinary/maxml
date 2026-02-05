@@ -122,7 +122,7 @@ class Element(object):
         prefix: str = None
 
         if ":" in name:
-            (prefix, basename) = name.split(":", maxsplit=1)
+            prefix, basename = name.split(":", maxsplit=1)
 
         self._prefix: str = prefix
 
